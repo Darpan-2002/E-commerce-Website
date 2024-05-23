@@ -1,81 +1,89 @@
-import React, { useState } from "react";
-import Header from "./components/Header/header"
-import Products from "./components/products/Products"
+import { useState } from "react";
+import productData from "./data/products.json";
+
+import Header from "./components/Header/header";
+import Products from "./components/products/Products";
 import Cart from "./components/cart/Cart";
+import AddProduct from "./components/AddProduct/AddProduct";
 
 function App() {
+  const [cartItems, setCartItems] = useState([]);
+  const [products, setProducts] = useState(productData);
+
   const [showCart, setShowCart] = useState(false);
-  const [cartItems, setcartItems] = useState([]);
+  const [showAddProduct, setShowAddProduct] = useState(false);
 
   const openCart = () => setShowCart(true);
   const closeCart = () => setShowCart(false);
 
-  const handleAddToCart = (productId, productName, productImage) => {
-    // let updatedCartItems = cartItems;
-    // updatedCartItems = updatedCartItems.concat({
-    //   id: productId,
-    //   name: productName,
-    //   image: productImage,
-    //   quantity: 1,
-    // });
-    const product_index = cartItems.findIndex(
+  const openAddProduct = () => setShowAddProduct(true);
+  const closeAddProduct = () => setShowAddProduct(false);
+
+  const handleAddToCart = (productId, productName, productImg) => {
+    const productInCartIndex = cartItems.findIndex(
       (item) => item.id === productId
     );
-    if (product_index === -1) {
-      const cartItem = {
-        id: productId,
-        name: productName,
-        image: productImage,
-        quantity: 1,
-      }
-      setcartItems((state) => [...state, cartItem]);
+    if (productInCartIndex === -1) {
+      setCartItems((prev) => [
+        ...prev,
+        { id: productId, name: productName, image: productImg, quantity: 1 },
+      ]);
+    } else {
+      const newCartItems = [...cartItems];
+      newCartItems[productInCartIndex].quantity += 1;
+      setCartItems(newCartItems);
     }
-    else {
-      const updatedItems = [...cartItems];
-      updatedItems[product_index].quantity += 1;
-      setcartItems(updatedItems);
-    }
-    // setcartItems(updatedCartItems);
   };
 
   const handleIncreaseQuantity = (productId) => {
-    const product_index = cartItems.findIndex(
-      (item) => item.id === productId
-    );
-    const updatedItems = [...cartItems];
-    updatedItems[product_index].quantity += 1;
-    setcartItems(updatedItems);
+    const productIndex = cartItems.findIndex((item) => item.id === productId);
+    if (productIndex === -1) return;
+    const newCartItems = [...cartItems];
+    newCartItems[productIndex].quantity += 1;
+    setCartItems(newCartItems);
   };
 
   const handleDecreaseQuantity = (productId) => {
-    const product_index = cartItems.findIndex(
-      (item) => item.id === productId
-    );
-    const qty = cartItems[product_index].quantity;
-    let updatedItems = [...cartItems];
-    if (qty === 1) {
-      updatedItems = updatedItems.filter(
-        (item, index) => index !== product_index
-      )
+    const productIndex = cartItems.findIndex((item) => item.id === productId);
+    if (productIndex === -1) return;
+    let newCartItems = [...cartItems];
+    if (newCartItems[productIndex].quantity === 1) {
+      newCartItems = newCartItems.filter((item) => item.id !== productId);
+    } else {
+      newCartItems[productIndex].quantity -= 1;
     }
-    else {
-      updatedItems[product_index].quantity -= 1;
-    }
-    setcartItems(updatedItems)
+    setCartItems(newCartItems);
+  };
+
+  const handleAddProduct = (productName) => {
+    setProducts((prev) => [
+      ...prev,
+      { id: prev.length + 1, name: productName, image: "default_product.png" },
+    ]);
+    closeAddProduct();
   };
 
   return (
-    <div>
-      <Header openCart={openCart} />
-      <Products onAddToCart={handleAddToCart} />
+    <>
+      <Header
+        showCart={showCart}
+        onCartClick={openCart}
+        onAddProductClick={openAddProduct}
+      />
+      <Products products={products} onAddToCart={handleAddToCart} />
       <Cart
         showCart={showCart}
         closeCart={closeCart}
         cartItems={cartItems}
-        onIncQuantity={handleIncreaseQuantity}
         onDecQuantity={handleDecreaseQuantity}
+        onIncQuantity={handleIncreaseQuantity}
       />
-    </div>
+      <AddProduct
+        showAddProduct={showAddProduct}
+        closeAddProduct={closeAddProduct}
+        onAddProduct={handleAddProduct}
+      />
+    </>
   );
 }
 
