@@ -22,12 +22,12 @@ button {
     padding: 10px 20px;
 }
 
-.yellow button {
+.yellow-button {
     background-color: var(--yellow);
     color: var(--dark);
 }
 
-.black button {
+.black-button {
     background-color: var(--dark);
     color: var(--white);
 }
