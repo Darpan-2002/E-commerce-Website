@@ -4,7 +4,7 @@ import "./Header.css";
 function Header({ onCartClick, onAddProductClick }) {
   return (
     <header className="header">
-      <h1>My React Store</h1>
+      <h1>Welcome to Our Store</h1>
       <div>
         <button
           className="yellow-button"
